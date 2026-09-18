@@ -1,0 +1,5 @@
+dist/
+*.png
+!src/assets/*.png
+node_modules/
+upload/
