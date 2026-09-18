@@ -357,7 +357,7 @@ if (dialog) {
 }
 
 // -------------------------------------------------------------
-// INTEGRAÇÃO HYGRAPH (CMS)
+// INTEGRAÇÃO HYGRAPH (CMS) - PADRÃO VISUAL IDÊNTICO AOS ORIGINAIS
 // -------------------------------------------------------------
 async function carregarNoticiasHygraph() {
   const query = `
@@ -393,13 +393,15 @@ async function carregarNoticiasHygraph() {
 
     listaNoticias.reverse().forEach((noticia) => {
       const storyKey = `hygraph-${noticia.id}`;
-      const dataFormatada = new Date(noticia.publishedAt).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
+      const dataObj = new Date(noticia.publishedAt);
+      const dataFormatada = dataObj.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long'
       });
+      const dataIso = dataObj.toISOString().split('T')[0];
+      const categoriaNome = (noticia.categoria || 'Geral').toUpperCase();
 
-      // Extrai os parágrafos do texto vindo do Hygraph
+      // Extrai parágrafos de texto
       let paragrafos = [];
       if (noticia.conteudo?.raw?.children) {
         paragrafos = noticia.conteudo.raw.children
@@ -410,35 +412,39 @@ async function carregarNoticiasHygraph() {
         paragrafos = noticia.conteudo.text.split('\n').filter((t) => t.trim().length > 0);
       }
 
-      // Adiciona o conteúdo dinâmico ao objeto stories
+      // Adiciona ao objeto stories para abrir no modal dialog
       stories[storyKey] = {
-        category: (noticia.categoria || 'GERAL').toUpperCase(),
+        category: categoriaNome,
         title: noticia.titulo,
         lead: noticia.subtitulo || '',
-        source: `${dataFormatada} • Redação Portal Bodocó`,
+        source: `${dataFormatada} de ${dataObj.getFullYear()} • Redação Portal Bodocó`,
         image: noticia.capa?.url || '',
         imageAlt: noticia.titulo,
         body: paragrafos
       };
 
-      // Cria e insere o card HTML no início da grade
+      // Cria o card seguindo exatamente as classes e HTML do index.html
       if (newsGrid) {
         const article = document.createElement('article');
         article.className = 'news-card story-open';
         article.tabIndex = 0;
+        article.setAttribute('role', 'button');
         article.dataset.story = storyKey;
-        article.dataset.category = (noticia.categoria || 'GERAL').toUpperCase();
+        article.dataset.category = noticia.categoria || 'Geral';
         article.dataset.title = noticia.titulo;
 
         article.innerHTML = `
-          ${noticia.capa?.url ? `<div class="news-media"><img src="${noticia.capa.url}" alt="${noticia.titulo}" loading="lazy"></div>` : ''}
-          <div class="news-body">
-            <span class="news-category">${(noticia.categoria || 'GERAL').toUpperCase()}</span>
-            <h3 class="news-title">${noticia.titulo}</h3>
-            ${noticia.subtitulo ? `<p class="news-lead">${noticia.subtitulo}</p>` : ''}
-            <div class="news-meta">
-              <span>${dataFormatada}</span>
+          <div class="card-visual article-card-image" aria-hidden="true">
+            ${noticia.capa?.url ? `<img src="${noticia.capa.url}" alt="" />` : ''}
+          </div>
+          <div class="card-copy">
+            <div class="story-meta">
+              <span class="tag tag-yellow">${categoriaNome}</span>
+              <span>NOVA</span>
             </div>
+            <h3>${noticia.titulo}</h3>
+            ${noticia.subtitulo ? `<p>${noticia.subtitulo}</p>` : ''}
+            <time datetime="${dataIso}">${dataFormatada}</time>
           </div>
         `;
 
@@ -447,7 +453,7 @@ async function carregarNoticiasHygraph() {
       }
     });
 
-    // Atualiza a lista de cards e o contador
+    // Atualiza a contagem e filtros com os novos cards
     cards = [...document.querySelectorAll('.news-card')];
     applyFilters();
   } catch (erro) {
