@@ -1,5 +1,7 @@
+const HYGRAPH_ENDPOINT = 'https://us-west-2.cdn.hygraph.com/content/cmtup25dl011107v1w3cuwi71/master';
+
 const search = document.querySelector('#news-search');
-const cards = [...document.querySelectorAll('.news-card')];
+let cards = [...document.querySelectorAll('.news-card')];
 const filters = [...document.querySelectorAll('.filter-button')];
 const resultCount = document.querySelector('#result-count');
 const emptyState = document.querySelector('#empty-state');
@@ -17,10 +19,13 @@ function applyFilters() {
     card.hidden = !(categoryMatch && textMatch);
     if (!card.hidden) visible += 1;
   });
-  resultCount.textContent = visible;
-  document.querySelector('.results-status').lastChild.textContent = visible === 1 ? ' matéria encontrada' : ' matérias encontradas';
-  emptyState.hidden = visible !== 0;
-  newsGrid.hidden = visible === 0;
+  if (resultCount) resultCount.textContent = visible;
+  const statusContainer = document.querySelector('.results-status');
+  if (statusContainer && statusContainer.lastChild) {
+    statusContainer.lastChild.textContent = visible === 1 ? ' matéria encontrada' : ' matérias encontradas';
+  }
+  if (emptyState) emptyState.hidden = visible !== 0;
+  if (newsGrid) newsGrid.hidden = visible === 0;
 }
 
 filters.forEach((button) => button.addEventListener('click', () => {
@@ -34,7 +39,7 @@ document.querySelectorAll('[data-filter-link]').forEach((link) => link.addEventL
   matching?.click();
 }));
 
-search.addEventListener('input', applyFilters);
+if (search) search.addEventListener('input', applyFilters);
 document.addEventListener('keydown', (event) => {
   if (event.key === '/' && document.activeElement !== search) {
     event.preventDefault();
@@ -42,23 +47,28 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-document.querySelector('#clear-search').addEventListener('click', () => {
-  search.value = '';
-  activeFilter = 'Todos';
-  filters[0].click();
-  search.focus();
-});
+const clearBtn = document.querySelector('#clear-search');
+if (clearBtn) {
+  clearBtn.addEventListener('click', () => {
+    search.value = '';
+    activeFilter = 'Todos';
+    filters[0]?.click();
+    search.focus();
+  });
+}
 
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#main-nav');
-menuButton.addEventListener('click', () => {
-  const open = nav.classList.toggle('open');
-  menuButton.setAttribute('aria-expanded', String(open));
-});
-nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
-  nav.classList.remove('open');
-  menuButton.setAttribute('aria-expanded', 'false');
-}));
+if (menuButton && nav) {
+  menuButton.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    menuButton.setAttribute('aria-expanded', String(open));
+  });
+  nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+    nav.classList.remove('open');
+    menuButton.setAttribute('aria-expanded', 'false');
+  }));
+}
 
 const stories = {
   'tce-contratacoes-temporarias': {
@@ -254,144 +264,287 @@ function openStory(card) {
     ]
   } : rawStory;
   lastStoryTrigger = card;
-  dialogCategory.textContent = story.category;
-  dialogTitle.textContent = story.title;
-  dialogLead.textContent = story.lead;
-  document.querySelector('#dialog-source').textContent = story.source;
-  document.querySelector('#dialog-demo').hidden = !story.demo;
+  if (dialogCategory) dialogCategory.textContent = story.category;
+  if (dialogTitle) dialogTitle.textContent = story.title;
+  if (dialogLead) dialogLead.textContent = story.lead;
+  
+  const sourceEl = document.querySelector('#dialog-source');
+  if (sourceEl) sourceEl.textContent = story.source || 'Redação Portal Bodocó';
+  
+  const demoEl = document.querySelector('#dialog-demo');
+  if (demoEl) demoEl.hidden = !story.demo;
+
   const dialogImage = document.querySelector('#dialog-image');
-  dialogImage.hidden = !story.image;
-  dialogImage.src = story.image || '';
-  dialogImage.alt = story.imageAlt || '';
-  dialogImage.classList.toggle('image-contain', Boolean(story.imageContain));
-  dialogMedia.replaceChildren();
-  if (story.instagramEmbed && story.instagramUrl) {
-    const figure = document.createElement('figure');
-    figure.className = 'instagram-embed';
-
-    const iframe = document.createElement('iframe');
-    iframe.src = story.instagramEmbed;
-    iframe.title = `Vídeo do Instagram: ${story.title}`;
-    iframe.loading = 'lazy';
-    iframe.allow = 'encrypted-media; picture-in-picture';
-    iframe.allowFullscreen = true;
-    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-
-    const caption = document.createElement('figcaption');
-    caption.append('Vídeo: ');
-    const link = document.createElement('a');
-    link.href = story.instagramUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = `${story.instagramCredit || 'Instagram'} — assistir no Instagram`;
-    caption.append(link);
-
-    figure.append(iframe, caption);
-    dialogMedia.append(figure);
+  if (dialogImage) {
+    dialogImage.hidden = !story.image;
+    dialogImage.src = story.image || '';
+    dialogImage.alt = story.imageAlt || '';
+    dialogImage.classList.toggle('image-contain', Boolean(story.imageContain));
   }
+  
+  if (dialogMedia) {
+    dialogMedia.replaceChildren();
+    if (story.instagramEmbed && story.instagramUrl) {
+      const figure = document.createElement('figure');
+      figure.className = 'instagram-embed';
+
+      const iframe = document.createElement('iframe');
+      iframe.src = story.instagramEmbed;
+      iframe.title = `Vídeo do Instagram: ${story.title}`;
+      iframe.loading = 'lazy';
+      iframe.allow = 'encrypted-media; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+
+      const caption = document.createElement('figcaption');
+      caption.append('Vídeo: ');
+      const link = document.createElement('a');
+      link.href = story.instagramUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = `${story.instagramCredit || 'Instagram'} — assistir no Instagram`;
+      caption.append(link);
+
+      figure.append(iframe, caption);
+      dialogMedia.append(figure);
+    }
+  }
+
   const dialogContent = document.querySelector('#dialog-content');
-  const contentNodes = story.body.map((text) => {
-    const paragraph = document.createElement('p');
-    paragraph.textContent = text;
-    return paragraph;
-  });
-  if (story.sourceUrl) {
-    const sourceLink = document.createElement('a');
-    sourceLink.className = 'story-source-link';
-    sourceLink.href = story.sourceUrl;
-    sourceLink.target = '_blank';
-    sourceLink.rel = 'noopener noreferrer';
-    sourceLink.textContent = story.sourceLabel || 'Consultar fonte original';
-    contentNodes.push(sourceLink);
+  if (dialogContent) {
+    const contentNodes = (story.body || []).map((text) => {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = text;
+      return paragraph;
+    });
+    if (story.sourceUrl) {
+      const sourceLink = document.createElement('a');
+      sourceLink.className = 'story-source-link';
+      sourceLink.href = story.sourceUrl;
+      sourceLink.target = '_blank';
+      sourceLink.rel = 'noopener noreferrer';
+      sourceLink.textContent = story.sourceLabel || 'Consultar fonte original';
+      contentNodes.push(sourceLink);
+    }
+    dialogContent.replaceChildren(...contentNodes);
   }
-  dialogContent.replaceChildren(...contentNodes);
-  dialog.showModal();
+  if (dialog) dialog.showModal();
 }
 
-document.querySelectorAll('.story-open').forEach((card) => {
-  card.addEventListener('click', () => openStory(card));
-  card.addEventListener('keydown', (event) => {
+function bindStoryEvents(element) {
+  element.addEventListener('click', () => openStory(element));
+  element.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      openStory(card);
+      openStory(element);
     }
   });
-});
+}
 
-document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
-dialog.addEventListener('click', (event) => {
-  if (event.target === dialog) dialog.close();
-});
-dialog.addEventListener('close', () => {
-  dialogMedia.replaceChildren();
-  lastStoryTrigger?.focus();
-});
+document.querySelectorAll('.story-open').forEach(bindStoryEvents);
 
+const closeDialogBtn = document.querySelector('.dialog-close');
+if (closeDialogBtn) closeDialogBtn.addEventListener('click', () => dialog.close());
+
+if (dialog) {
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog.addEventListener('close', () => {
+    if (dialogMedia) dialogMedia.replaceChildren();
+    lastStoryTrigger?.focus();
+  });
+}
+
+// -------------------------------------------------------------
+// INTEGRAÇÃO HYGRAPH (CMS)
+// -------------------------------------------------------------
+async function carregarNoticiasHygraph() {
+  const query = `
+    query ObterNoticias {
+      noticias(orderBy: publishedAt_DESC) {
+        id
+        titulo
+        subtitulo
+        categoria
+        publishedAt
+        capa {
+          url
+        }
+        conteudo {
+          text
+          raw
+        }
+      }
+    }
+  `;
+
+  try {
+    const resposta = await fetch(HYGRAPH_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    });
+
+    const resultado = await resposta.json();
+    const listaNoticias = resultado?.data?.noticias;
+
+    if (!Array.isArray(listaNoticias) || listaNoticias.length === 0) return;
+
+    listaNoticias.reverse().forEach((noticia) => {
+      const storyKey = `hygraph-${noticia.id}`;
+      const dataFormatada = new Date(noticia.publishedAt).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+
+      // Extrai os parágrafos do texto vindo do Hygraph
+      let paragrafos = [];
+      if (noticia.conteudo?.raw?.children) {
+        paragrafos = noticia.conteudo.raw.children
+          .filter((bloco) => bloco.children)
+          .map((bloco) => bloco.children.map((c) => c.text).join(''))
+          .filter((txt) => txt.trim().length > 0);
+      } else if (noticia.conteudo?.text) {
+        paragrafos = noticia.conteudo.text.split('\n').filter((t) => t.trim().length > 0);
+      }
+
+      // Adiciona o conteúdo dinâmico ao objeto stories
+      stories[storyKey] = {
+        category: (noticia.categoria || 'GERAL').toUpperCase(),
+        title: noticia.titulo,
+        lead: noticia.subtitulo || '',
+        source: `${dataFormatada} • Redação Portal Bodocó`,
+        image: noticia.capa?.url || '',
+        imageAlt: noticia.titulo,
+        body: paragrafos
+      };
+
+      // Cria e insere o card HTML no início da grade
+      if (newsGrid) {
+        const article = document.createElement('article');
+        article.className = 'news-card story-open';
+        article.tabIndex = 0;
+        article.dataset.story = storyKey;
+        article.dataset.category = (noticia.categoria || 'GERAL').toUpperCase();
+        article.dataset.title = noticia.titulo;
+
+        article.innerHTML = `
+          ${noticia.capa?.url ? `<div class="news-media"><img src="${noticia.capa.url}" alt="${noticia.titulo}" loading="lazy"></div>` : ''}
+          <div class="news-body">
+            <span class="news-category">${(noticia.categoria || 'GERAL').toUpperCase()}</span>
+            <h3 class="news-title">${noticia.titulo}</h3>
+            ${noticia.subtitulo ? `<p class="news-lead">${noticia.subtitulo}</p>` : ''}
+            <div class="news-meta">
+              <span>${dataFormatada}</span>
+            </div>
+          </div>
+        `;
+
+        bindStoryEvents(article);
+        newsGrid.insertBefore(article, newsGrid.firstChild);
+      }
+    });
+
+    // Atualiza a lista de cards e o contador
+    cards = [...document.querySelectorAll('.news-card')];
+    applyFilters();
+  } catch (erro) {
+    console.error('Erro ao conectar ao Hygraph:', erro);
+  }
+}
+
+carregarNoticiasHygraph();
+
+// -------------------------------------------------------------
+// ENQUETE E OUTRAS FUNCIONALIDADES
+// -------------------------------------------------------------
 const pollForm = document.querySelector('#poll-form');
-const voteButton = pollForm.querySelector('.vote-button');
-const pollFeedback = document.querySelector('#poll-feedback');
-const baseline = { Segurança: 37, Infraestrutura: 29, Saúde: 24, 'Cultura e esporte': 10 };
+if (pollForm) {
+  const voteButton = pollForm.querySelector('.vote-button');
+  const pollFeedback = document.querySelector('#poll-feedback');
+  const baseline = { Segurança: 37, Infraestrutura: 29, Saúde: 24, 'Cultura e esporte': 10 };
 
-pollForm.addEventListener('change', () => { voteButton.disabled = false; });
+  pollForm.addEventListener('change', () => { if (voteButton) voteButton.disabled = false; });
 
-function renderResults(selected) {
-  const totals = { ...baseline };
-  if (selected) totals[selected] += 1;
-  const total = Object.values(totals).reduce((sum, value) => sum + value, 0);
-  pollForm.querySelectorAll('.poll-option').forEach((label) => {
-    const value = label.querySelector('input').value;
-    const percent = Math.round((totals[value] / total) * 100);
-    label.style.setProperty('--result-width', `${percent}%`);
-    label.querySelector('em').textContent = `${percent}%`;
+  function renderResults(selected) {
+    const totals = { ...baseline };
+    if (selected) totals[selected] += 1;
+    const total = Object.values(totals).reduce((sum, value) => sum + value, 0);
+    pollForm.querySelectorAll('.poll-option').forEach((label) => {
+      const input = label.querySelector('input');
+      if (input) {
+        const value = input.value;
+        const percent = Math.round((totals[value] / total) * 100);
+        label.style.setProperty('--result-width', `${percent}%`);
+        const em = label.querySelector('em');
+        if (em) em.textContent = `${percent}%`;
+      }
+    });
+  }
+
+  function showVotedState(selected) {
+    renderResults(selected);
+    if (voteButton) {
+      voteButton.textContent = 'Voto registrado';
+      voteButton.disabled = true;
+    }
+    if (pollFeedback) {
+      pollFeedback.innerHTML = `Obrigado por participar! <button type="button" id="reset-poll">Reiniciar demonstração</button>`;
+      document.querySelector('#reset-poll')?.addEventListener('click', resetPoll);
+    }
+  }
+
+  function resetPoll() {
+    localStorage.removeItem('portal-bodoco-demo-vote');
+    pollForm.reset();
+    pollForm.querySelectorAll('.poll-option').forEach((label) => {
+      label.style.removeProperty('--result-width');
+      const em = label.querySelector('em');
+      if (em) em.textContent = '';
+    });
+    if (voteButton) {
+      voteButton.innerHTML = 'Votar agora <span aria-hidden="true">→</span>';
+      voteButton.disabled = true;
+    }
+    if (pollFeedback) pollFeedback.textContent = '';
+  }
+
+  pollForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const selected = new FormData(pollForm).get('poll');
+    if (!selected) return;
+    localStorage.setItem('portal-bodoco-demo-vote', selected);
+    showVotedState(selected);
+    const toast = document.querySelector('#toast');
+    if (toast) {
+      toast.textContent = 'Seu voto de demonstração foi registrado.';
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 2600);
+    }
+  });
+
+  const savedVote = localStorage.getItem('portal-bodoco-demo-vote');
+  if (savedVote && baseline[savedVote] !== undefined) {
+    const radio = pollForm.querySelector(`input[value="${CSS.escape(savedVote)}"]`);
+    if (radio) radio.checked = true;
+    showVotedState(savedVote);
+  }
+}
+
+const socialBtn = document.querySelector('[data-placeholder="social"]');
+if (socialBtn) {
+  socialBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    const toast = document.querySelector('#toast');
+    if (toast) {
+      toast.textContent = 'Link demonstrativo — conecte aqui o Instagram oficial.';
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 2600);
+    }
   });
 }
-
-function showVotedState(selected) {
-  renderResults(selected);
-  voteButton.textContent = 'Voto registrado';
-  voteButton.disabled = true;
-  pollFeedback.innerHTML = `Obrigado por participar! <button type="button" id="reset-poll">Reiniciar demonstração</button>`;
-  document.querySelector('#reset-poll').addEventListener('click', resetPoll);
-}
-
-function resetPoll() {
-  localStorage.removeItem('portal-bodoco-demo-vote');
-  pollForm.reset();
-  pollForm.querySelectorAll('.poll-option').forEach((label) => {
-    label.style.removeProperty('--result-width');
-    label.querySelector('em').textContent = '';
-  });
-  voteButton.innerHTML = 'Votar agora <span aria-hidden="true">→</span>';
-  voteButton.disabled = true;
-  pollFeedback.textContent = '';
-}
-
-pollForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const selected = new FormData(pollForm).get('poll');
-  if (!selected) return;
-  localStorage.setItem('portal-bodoco-demo-vote', selected);
-  showVotedState(selected);
-  const toast = document.querySelector('#toast');
-  toast.textContent = 'Seu voto de demonstração foi registrado.';
-  toast.classList.add('visible');
-  setTimeout(() => toast.classList.remove('visible'), 2600);
-});
-
-const savedVote = localStorage.getItem('portal-bodoco-demo-vote');
-if (savedVote && baseline[savedVote] !== undefined) {
-  const radio = pollForm.querySelector(`input[value="${CSS.escape(savedVote)}"]`);
-  if (radio) radio.checked = true;
-  showVotedState(savedVote);
-}
-
-document.querySelector('[data-placeholder="social"]').addEventListener('click', (event) => {
-  event.preventDefault();
-  const toast = document.querySelector('#toast');
-  toast.textContent = 'Link demonstrativo — conecte aqui o Instagram oficial.';
-  toast.classList.add('visible');
-  setTimeout(() => toast.classList.remove('visible'), 2600);
-});
 
 const adTabs = [...document.querySelectorAll('.ad-tab')];
 const adCards = [...document.querySelectorAll('.ad-card')];
@@ -414,29 +567,46 @@ let lastAdTrigger;
 
 function openAdInquiry(trigger, company = '') {
   lastAdTrigger = trigger;
-  if (company && company !== 'Sua empresa no Portal Bodocó') {
+  if (company && company !== 'Sua empresa no Portal Bodocó' && adForm?.elements?.company) {
     adForm.elements.company.value = company;
   }
-  adDialog.showModal();
-  requestAnimationFrame(() => adForm.elements.name.focus());
+  if (adDialog) {
+    adDialog.showModal();
+    requestAnimationFrame(() => adForm?.elements?.name?.focus());
+  }
 }
 
-document.querySelector('#open-ad-inquiry').addEventListener('click', (event) => openAdInquiry(event.currentTarget));
+const openAdInquiryBtn = document.querySelector('#open-ad-inquiry');
+if (openAdInquiryBtn) {
+  openAdInquiryBtn.addEventListener('click', (event) => openAdInquiry(event.currentTarget));
+}
+
 document.querySelectorAll('.ad-detail').forEach((button) => button.addEventListener('click', () => {
   openAdInquiry(button, button.dataset.adTitle);
 }));
-document.querySelector('#close-ad-inquiry').addEventListener('click', () => adDialog.close());
-adDialog.addEventListener('click', (event) => {
-  if (event.target === adDialog) adDialog.close();
-});
-adDialog.addEventListener('close', () => lastAdTrigger?.focus());
 
-adForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  adDialog.close();
-  adForm.reset();
-  const toast = document.querySelector('#toast');
-  toast.textContent = 'Solicitação simulada — o canal comercial será conectado depois.';
-  toast.classList.add('visible');
-  setTimeout(() => toast.classList.remove('visible'), 3000);
-});
+const closeAdInquiryBtn = document.querySelector('#close-ad-inquiry');
+if (closeAdInquiryBtn && adDialog) {
+  closeAdInquiryBtn.addEventListener('click', () => adDialog.close());
+}
+
+if (adDialog) {
+  adDialog.addEventListener('click', (event) => {
+    if (event.target === adDialog) adDialog.close();
+  });
+  adDialog.addEventListener('close', () => lastAdTrigger?.focus());
+}
+
+if (adForm) {
+  adForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    adDialog?.close();
+    adForm.reset();
+    const toast = document.querySelector('#toast');
+    if (toast) {
+      toast.textContent = 'Solicitação simulada — o canal comercial será conectado depois.';
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3000);
+    }
+  });
+}
