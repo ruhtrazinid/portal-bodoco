@@ -262,7 +262,7 @@ function bindStoryEvents(element) {
 document.querySelectorAll('.story-open').forEach(bindStoryEvents);
 
 // -------------------------------------------------------------
-// INTEGRAÇÃO HYGRAPH (CMS) COM DESTAQUES DINÂMICOS
+// INTEGRAÇÃO HYGRAPH (CMS) - DESTAQUES E LISTA GERAL COMPLETA
 // -------------------------------------------------------------
 async function carregarNoticiasHygraph() {
   const query = `
@@ -296,7 +296,7 @@ async function carregarNoticiasHygraph() {
 
     if (!Array.isArray(listaNoticias) || listaNoticias.length === 0) return;
 
-    // Registra todas as notícias no objeto stories
+    // 1. Registra todas as notícias no objeto stories
     listaNoticias.forEach((noticia) => {
       const storyKey = `hygraph-${noticia.id}`;
       const dataObj = new Date(noticia.publishedAt);
@@ -327,7 +327,7 @@ async function carregarNoticiasHygraph() {
       };
     });
 
-    // 1. Matéria mais recente assume o LEAD PRINCIPAL (esquerda)
+    // 2. Preenche os 4 blocos de AGORA EM DESTAQUE (com as mais recentes)
     if (listaNoticias[0]) {
       const n1 = listaNoticias[0];
       const slot1 = document.querySelector('#lead-story-slot');
@@ -349,7 +349,6 @@ async function carregarNoticiasHygraph() {
       }
     }
 
-    // 2. Segunda notícia assume o mini-destaque 1
     if (listaNoticias[1]) {
       const n2 = listaNoticias[1];
       const slot2 = document.querySelector('#sublead-story-slot-1');
@@ -366,7 +365,6 @@ async function carregarNoticiasHygraph() {
       }
     }
 
-    // 3. Terceira notícia assume o mini-destaque 2
     if (listaNoticias[2]) {
       const n3 = listaNoticias[2];
       const slot3 = document.querySelector('#sublead-story-slot-2');
@@ -383,7 +381,6 @@ async function carregarNoticiasHygraph() {
       }
     }
 
-    // 4. Quarta notícia assume o mini-destaque 3
     if (listaNoticias[3]) {
       const n4 = listaNoticias[3];
       const slot4 = document.querySelector('#sublead-story-slot-3');
@@ -400,9 +397,9 @@ async function carregarNoticiasHygraph() {
       }
     }
 
-    // 5. Demais notícias (da 5ª em diante) entram no grid padrão
-    const restantes = listaNoticias.slice(4).reverse();
-    restantes.forEach((noticia) => {
+    // 3. INSERE TODAS AS NOTÍCIAS NA LISTA GERAL ("ÚLTIMAS NOTÍCIAS" / CATEGORIAS)
+    // O reverse() garante que a mais nova fique sempre no topo do grid
+    [...listaNoticias].reverse().forEach((noticia) => {
       const storyKey = `hygraph-${noticia.id}`;
       const dataObj = new Date(noticia.publishedAt);
       const dataFormatada = dataObj.toLocaleDateString('pt-BR', {
@@ -418,6 +415,7 @@ async function carregarNoticiasHygraph() {
         article.tabIndex = 0;
         article.setAttribute('role', 'button');
         article.dataset.story = storyKey;
+        // Salva a categoria exata para os botões de filtro (Bodocó, Política, Região, etc.) funcionarem
         article.dataset.category = noticia.categoria || 'Geral';
         article.dataset.title = noticia.titulo;
 
@@ -441,6 +439,7 @@ async function carregarNoticiasHygraph() {
       }
     });
 
+    // Atualiza a lista interna de cards e recalcula os filtros e contadores
     cards = [...document.querySelectorAll('.news-card')];
     applyFilters();
   } catch (erro) {
@@ -664,7 +663,6 @@ function iniciarRotacaoManchetes() {
   function recolherManchetes() {
     const lista = [];
 
-    // Lê matérias cadastradas no objeto stories
     if (typeof stories === 'object' && stories !== null) {
       Object.entries(stories).forEach(([chave, valor]) => {
         const titulo = Array.isArray(valor) ? valor[1] : valor?.title;
@@ -674,7 +672,6 @@ function iniciarRotacaoManchetes() {
       });
     }
 
-    // Lê matérias criadas dinamicamente na página
     document.querySelectorAll('.news-card, .lead-story, .mini-story').forEach((el) => {
       const h2 = el.querySelector('h2');
       const h3 = el.querySelector('h3');
