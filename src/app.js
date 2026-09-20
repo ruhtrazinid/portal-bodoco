@@ -654,6 +654,32 @@ setInterval(() => {
 }, 15 * 60 * 1000);
 
 // -------------------------------------------------------------
+// SINCRONIZAÇÃO DA DATA DO BLOCO AGORA EM DESTAQUE
+// -------------------------------------------------------------
+function atualizarDataDestaque() {
+  const dateEl = document.querySelector('#hero-date');
+  if (!dateEl) return;
+
+  const agora = new Date();
+
+  // Formata a data no padrão brasileiro: "Sábado, 19 de setembro"
+  let dataTexto = agora.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  });
+
+  // Coloca a primeira letra da semana em maiúscula
+  dataTexto = dataTexto.charAt(0).toUpperCase() + dataTexto.slice(1);
+
+  // Atualiza o texto na tela e o atributo datetime
+  dateEl.textContent = dataTexto;
+  dateEl.setAttribute('datetime', agora.toISOString().split('T')[0]);
+}
+
+atualizarDataDestaque();
+
+// -------------------------------------------------------------
 // ROTAÇÃO DE MANCHETES AUTOMÁTICAS NO TICKER
 // -------------------------------------------------------------
 function iniciarRotacaoManchetes() {
