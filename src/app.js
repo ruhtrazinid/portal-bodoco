@@ -70,7 +70,7 @@ if (menuButton && nav) {
   }));
 }
 
-const stories = {
+export const stories = {
   'tce-contratacoes-temporarias': {
     category: 'PERNAMBUCO',
     title: 'TCE-PE alerta municípios para excesso de contratações temporárias',
@@ -242,93 +242,11 @@ const stories = {
   entrevista: ['FALA PERNAMBUCO', 'Quem faz a cultura pulsar no Sertão', 'Uma conversa de demonstração sobre música, identidade e as histórias de quem movimenta a cena regional.']
 };
 
-const dialog = document.querySelector('#story-dialog');
-const dialogTitle = document.querySelector('#dialog-title');
-const dialogLead = document.querySelector('#dialog-lead');
-const dialogCategory = document.querySelector('#dialog-category');
-const dialogMedia = document.querySelector('#dialog-media');
-let lastStoryTrigger;
-
 function openStory(card) {
-  const rawStory = stories[card.dataset.story];
-  if (!rawStory) return;
-  const story = Array.isArray(rawStory) ? {
-    category: rawStory[0],
-    title: rawStory[1],
-    lead: rawStory[2],
-    source: 'Conteúdo demonstrativo',
-    demo: true,
-    body: [
-      'Esta é uma visualização funcional do modelo de leitura. Na versão editorial, este espaço receberá o texto completo, fotografias, créditos, fontes e links relacionados.',
-      'O conteúdo acima é fictício e foi incluído exclusivamente para demonstrar a experiência de navegação do novo portal.'
-    ]
-  } : rawStory;
-  lastStoryTrigger = card;
-  if (dialogCategory) dialogCategory.textContent = story.category;
-  if (dialogTitle) dialogTitle.textContent = story.title;
-  if (dialogLead) dialogLead.textContent = story.lead;
-  
-  const sourceEl = document.querySelector('#dialog-source');
-  if (sourceEl) sourceEl.textContent = story.source || 'Redação Portal Bodocó';
-  
-  const demoEl = document.querySelector('#dialog-demo');
-  if (demoEl) demoEl.hidden = !story.demo;
-
-  const dialogImage = document.querySelector('#dialog-image');
-  if (dialogImage) {
-    dialogImage.hidden = !story.image;
-    dialogImage.src = story.image || '';
-    dialogImage.alt = story.imageAlt || '';
-    dialogImage.classList.toggle('image-contain', Boolean(story.imageContain));
-  }
-  
-  if (dialogMedia) {
-    dialogMedia.replaceChildren();
-    if (story.instagramEmbed && story.instagramUrl) {
-      const figure = document.createElement('figure');
-      figure.className = 'instagram-embed';
-
-      const iframe = document.createElement('iframe');
-      iframe.src = story.instagramEmbed;
-      iframe.title = `Vídeo do Instagram: ${story.title}`;
-      iframe.loading = 'lazy';
-      iframe.allow = 'encrypted-media; picture-in-picture';
-      iframe.allowFullscreen = true;
-      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-
-      const caption = document.createElement('figcaption');
-      caption.append('Vídeo: ');
-      const link = document.createElement('a');
-      link.href = story.instagramUrl;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = `${story.instagramCredit || 'Instagram'} — assistir no Instagram`;
-      caption.append(link);
-
-      figure.append(iframe, caption);
-      dialogMedia.append(figure);
-    }
-  }
-
-  const dialogContent = document.querySelector('#dialog-content');
-  if (dialogContent) {
-    const contentNodes = (story.body || []).map((text) => {
-      const paragraph = document.createElement('p');
-      paragraph.textContent = text;
-      return paragraph;
-    });
-    if (story.sourceUrl) {
-      const sourceLink = document.createElement('a');
-      sourceLink.className = 'story-source-link';
-      sourceLink.href = story.sourceUrl;
-      sourceLink.target = '_blank';
-      sourceLink.rel = 'noopener noreferrer';
-      sourceLink.textContent = story.sourceLabel || 'Consultar fonte original';
-      contentNodes.push(sourceLink);
-    }
-    dialogContent.replaceChildren(...contentNodes);
-  }
-  if (dialog) dialog.showModal();
+  const storyKey = card.dataset.story;
+  if (!storyKey) return;
+  // Redireciona diretamente para a página exclusiva da notícia
+  window.location.href = `noticia.html?id=${encodeURIComponent(storyKey)}`;
 }
 
 function bindStoryEvents(element) {
@@ -342,19 +260,6 @@ function bindStoryEvents(element) {
 }
 
 document.querySelectorAll('.story-open').forEach(bindStoryEvents);
-
-const closeDialogBtn = document.querySelector('.dialog-close');
-if (closeDialogBtn) closeDialogBtn.addEventListener('click', () => dialog.close());
-
-if (dialog) {
-  dialog.addEventListener('click', (event) => {
-    if (event.target === dialog) dialog.close();
-  });
-  dialog.addEventListener('close', () => {
-    if (dialogMedia) dialogMedia.replaceChildren();
-    lastStoryTrigger?.focus();
-  });
-}
 
 // -------------------------------------------------------------
 // INTEGRAÇÃO HYGRAPH (CMS)
@@ -706,14 +611,7 @@ function iniciarRotacaoManchetes() {
     headlineEl.onclick = (e) => {
       e.preventDefault();
       if (item.story) {
-        const cartaoAlvo = document.querySelector(`[data-story="${item.story}"]`);
-        if (cartaoAlvo && typeof openStory === 'function') {
-          openStory(cartaoAlvo);
-        } else if (typeof stories[item.story] !== 'undefined') {
-          const elementoVirtual = document.createElement('div');
-          elementoVirtual.dataset.story = item.story;
-          openStory(elementoVirtual);
-        }
+        window.location.href = `noticia.html?id=${encodeURIComponent(item.story)}`;
       }
     };
   }

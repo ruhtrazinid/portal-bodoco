@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#b90012" />
+    <title>Portal Bodocó — Notícia</title>
+    <link rel="icon" type="image/png" href="./assets/portal-bodoco-mark.png" />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .article-page {
+        max-width: 820px;
+        margin: 40px auto 80px;
+        background: var(--white);
+        padding: 40px clamp(20px, 5vw, 50px);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+      .article-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--red);
+        text-decoration: none;
+        margin-bottom: 24px;
+      }
+      .article-back-link:hover {
+        text-decoration: underline;
+      }
+      .article-hero-media {
+        width: 100%;
+        max-height: 480px;
+        object-fit: cover;
+        margin: 25px 0;
+        border-radius: 4px;
+      }
+      .article-title-main {
+        font: 900 clamp(32px, 5vw, 48px)/1.05 Barlow Condensed, sans-serif;
+        text-transform: uppercase;
+        margin: 12px 0 16px;
+      }
+      .article-lead-text {
+        font-size: 18px;
+        line-height: 1.55;
+        color: var(--muted);
+        margin-bottom: 24px;
+      }
+      .article-body-content p {
+        font-size: 17px;
+        line-height: 1.8;
+        color: #333338;
+        margin-bottom: 20px;
+      }
+      .article-loading-state {
+        text-align: center;
+        padding: 80px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cabeçalho idêntico -->
+    <header class="site-header">
+      <div class="shell header-main">
+        <a class="brand" href="index.html" aria-label="Portal Bodocó — início">
+          <img class="brand-mark-image" src="./assets/portal-bodoco-mark.png" alt="" />
+          <span class="brand-copy"><strong>PORTAL</strong><b>BODOCÓ</b><small>A notícia perto de você</small><span class="brand-instagram">@portal_bodoco</span></span>
+        </a>
+        <nav class="main-nav">
+          <a href="index.html">Início</a>
+          <a href="index.html#noticias">Notícias</a>
+          <a href="index.html#anuncios">Anúncios</a>
+        </nav>
+        <div class="header-actions">
+          <a class="contact-link" href="mailto:portalbodoco767@gmail.com"><span>Envie sua pauta</span></a>
+          <a class="instagram-link" href="https://www.instagram.com/portal_bodoco/" target="_blank" rel="noopener noreferrer"><span>Instagram</span></a>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <article class="article-page" id="article-container">
+        <a class="article-back-link" href="index.html">← Voltar para a página inicial</a>
+        
+        <div id="article-loading" class="article-loading-state">
+          <p>A carregar notícia...</p>
+        </div>
+
+        <div id="article-content-wrapper" hidden>
+          <div class="story-meta">
+            <span class="tag" id="art-category">CATEGORIA</span>
+            <span id="art-source">Redação Portal Bodocó</span>
+          </div>
+
+          <h1 class="article-title-main" id="art-title"></h1>
+          <p class="article-lead-text" id="art-lead"></p>
+
+          <img id="art-image" class="article-hero-media" src="" alt="" hidden />
+          <div id="art-media"></div>
+
+          <div class="dialog-byline">
+            <span class="avatar"><img src="./assets/portal-bodoco-mark.png" alt="" /></span>
+            <span><b>Redação Portal Bodocó</b><small>Jornalismo Regional</small></span>
+          </div>
+
+          <div class="article-body-content" id="art-body"></div>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      <div class="shell footer-bottom">
+        <span>© 2026 Portal Bodocó</span>
+        <span>Todos os direitos reservados</span>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { stories } from './app.js';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const storyId = urlParams.get('id');
+
+      const loadingEl = document.querySelector('#article-loading');
+      const contentWrapper = document.querySelector('#article-content-wrapper');
+
+      async function exibirNoticia() {
+        if (!storyId) {
+          loadingEl.innerHTML = '<p>Notícia não encontrada. <a href="index.html">Voltar ao início</a></p>';
+          return;
+        }
+
+        let story = stories ? stories[storyId] : null;
+
+        // Se a notícia for do Hygraph e ainda não estiver carregada na memória local
+        if (!story && storyId.startsWith('hygraph-')) {
+          const rawId = storyId.replace('hygraph-', '');
+          const HYGRAPH_ENDPOINT = 'https://us-west-2.cdn.hygraph.com/content/cmtup25dl011107v1w3cuwi71/master';
+          const query = `query { noticia(where: { id: "${rawId}" }) { titulo subtitulo categoria publishedAt capa { url } conteudo { text raw } } }`;
+          try {
+            const res = await fetch(HYGRAPH_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query })
+            });
+            const dados = await res.json();
+            const n = dados?.data?.noticia;
+            if (n) {
+              let paragrafos = [];
+              if (n.conteudo?.raw?.children) {
+                paragrafos = n.conteudo.raw.children
+                  .filter(b => b.children)
+                  .map(b => b.children.map(c => c.text).join(''))
+                  .filter(t => t.trim().length > 0);
+              } else if (n.conteudo?.text) {
+                paragrafos = n.conteudo.text.split('\n').filter(t => t.trim().length > 0);
+              }
+              story = {
+                category: (n.categoria || 'Geral').toUpperCase(),
+                title: n.titulo,
+                lead: n.subtitulo || '',
+                image: n.capa?.url || '',
+                body: paragrafos
+              };
+            }
+          } catch(e) {
+            console.error(e);
+          }
+        }
+
+        if (!story) {
+          loadingEl.innerHTML = '<p>Matéria não localizada. <a href="index.html">Voltar ao início</a></p>';
+          return;
+        }
+
+        // Caso seja formato resumido do array demonstrativo
+        const finalStory = Array.isArray(story) ? {
+          category: story[0],
+          title: story[1],
+          lead: story[2],
+          body: ['Conteúdo demonstrativo completo da notícia.']
+        } : story;
+
+        document.title = `${finalStory.title} — Portal Bodocó`;
+        document.querySelector('#art-category').textContent = finalStory.category || 'NOTÍCIA';
+        document.querySelector('#art-title').textContent = finalStory.title;
+        document.querySelector('#art-lead').textContent = finalStory.lead || '';
+        
+        const imgEl = document.querySelector('#art-image');
+        if (finalStory.image) {
+          imgEl.src = finalStory.image;
+          imgEl.alt = finalStory.title;
+          imgEl.hidden = false;
+        }
+
+        const bodyEl = document.querySelector('#art-body');
+        bodyEl.innerHTML = '';
+        (finalStory.body || []).forEach(pText => {
+          const p = document.createElement('p');
+          p.textContent = pText;
+          bodyEl.appendChild(p);
+        });
+
+        loadingEl.hidden = true;
+        contentWrapper.hidden = false;
+      }
+
+      exibirNoticia();
+    </script>
+  </body>
+</html>
