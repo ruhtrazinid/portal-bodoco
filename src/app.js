@@ -662,3 +662,86 @@ setInterval(() => {
   buscarClimaBodoco();
   buscarCotacaoDolar();
 }, 15 * 60 * 1000);
+
+// -------------------------------------------------------------
+// ROTAÇÃO DE MANCHETES AUTOMÁTICAS NO TICKER
+// -------------------------------------------------------------
+function iniciarRotacaoManchetes() {
+  const headlineEl = document.querySelector('#ticker-headline-text');
+  if (!headlineEl) return;
+
+  function recolherManchetes() {
+    const lista = [];
+
+    // Lê matérias cadastradas no objeto stories
+    if (typeof stories === 'object' && stories !== null) {
+      Object.entries(stories).forEach(([chave, valor]) => {
+        const titulo = Array.isArray(valor) ? valor[1] : valor?.title;
+        if (titulo && typeof titulo === 'string' && titulo.trim().length > 0) {
+          lista.push({ texto: titulo.trim(), story: chave });
+        }
+      });
+    }
+
+    // Lê matérias criadas dinamicamente na página
+    document.querySelectorAll('.news-card, .lead-story, .mini-story').forEach((el) => {
+      const h2 = el.querySelector('h2');
+      const h3 = el.querySelector('h3');
+      const titulo = (h2?.textContent || h3?.textContent || '').trim();
+      const storyKey = el.dataset.story;
+      if (titulo && !lista.some((item) => item.texto === titulo)) {
+        lista.push({ texto: titulo, story: storyKey });
+      }
+    });
+
+    return lista;
+  }
+
+  let listaNoticias = recolherManchetes();
+  let indice = 0;
+
+  function apresentarNoticia(item) {
+    if (!item) return;
+    headlineEl.textContent = item.texto;
+    headlineEl.onclick = (e) => {
+      e.preventDefault();
+      if (item.story) {
+        const cartaoAlvo = document.querySelector(`[data-story="${item.story}"]`);
+        if (cartaoAlvo && typeof openStory === 'function') {
+          openStory(cartaoAlvo);
+        } else if (typeof stories[item.story] !== 'undefined') {
+          const elementoVirtual = document.createElement('div');
+          elementoVirtual.dataset.story = item.story;
+          openStory(elementoVirtual);
+        }
+      }
+    };
+  }
+
+  function avancarManchete() {
+    const novasNoticias = recolherManchetes();
+    if (novasNoticias.length > 0) {
+      listaNoticias = novasNoticias;
+    }
+
+    if (listaNoticias.length === 0) return;
+
+    headlineEl.classList.add('fade-out');
+
+    setTimeout(() => {
+      indice = (indice + 1) % listaNoticias.length;
+      apresentarNoticia(listaNoticias[indice]);
+      headlineEl.classList.remove('fade-out');
+    }, 400);
+  }
+
+  // Define a primeira notícia de imediato
+  if (listaNoticias.length > 0) {
+    apresentarNoticia(listaNoticias[0]);
+  }
+
+  // Alterna a cada 5 segundos
+  setInterval(avancarManchete, 5000);
+}
+
+iniciarRotacaoManchetes();
