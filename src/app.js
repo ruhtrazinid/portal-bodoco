@@ -357,7 +357,7 @@ if (dialog) {
 }
 
 // -------------------------------------------------------------
-// INTEGRAÇÃO HYGRAPH (CMS) - PADRÃO VISUAL IDÊNTICO AOS ORIGINAIS
+// INTEGRAÇÃO HYGRAPH (CMS)
 // -------------------------------------------------------------
 async function carregarNoticiasHygraph() {
   const query = `
@@ -401,7 +401,6 @@ async function carregarNoticiasHygraph() {
       const dataIso = dataObj.toISOString().split('T')[0];
       const categoriaNome = (noticia.categoria || 'Geral').toUpperCase();
 
-      // Extrai parágrafos de texto
       let paragrafos = [];
       if (noticia.conteudo?.raw?.children) {
         paragrafos = noticia.conteudo.raw.children
@@ -412,7 +411,6 @@ async function carregarNoticiasHygraph() {
         paragrafos = noticia.conteudo.text.split('\n').filter((t) => t.trim().length > 0);
       }
 
-      // Adiciona ao objeto stories para abrir no modal dialog
       stories[storyKey] = {
         category: categoriaNome,
         title: noticia.titulo,
@@ -423,7 +421,6 @@ async function carregarNoticiasHygraph() {
         body: paragrafos
       };
 
-      // Cria o card seguindo exatamente as classes e HTML do index.html
       if (newsGrid) {
         const article = document.createElement('article');
         article.className = 'news-card story-open';
@@ -453,7 +450,6 @@ async function carregarNoticiasHygraph() {
       }
     });
 
-    // Atualiza a contagem e filtros com os novos cards
     cards = [...document.querySelectorAll('.news-card')];
     applyFilters();
   } catch (erro) {
@@ -616,3 +612,53 @@ if (adForm) {
     }
   });
 }
+
+// -------------------------------------------------------------
+// BARRA DE SERVIÇOS EM TEMPO REAL (RELÓGIO, CLIMA E DÓLAR)
+// -------------------------------------------------------------
+function atualizarRelogio() {
+  const relogioEl = document.querySelector('#live-clock');
+  if (!relogioEl) return;
+  const agora = new Date();
+  relogioEl.textContent = agora.toLocaleTimeString('pt-BR', { hour12: false });
+}
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
+
+async function buscarClimaBodoco() {
+  const climaEl = document.querySelector('#weather-temp');
+  if (!climaEl) return;
+  try {
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-7.7797&longitude=-39.9333&current_weather=true');
+    const dados = await res.json();
+    if (dados?.current_weather) {
+      const temp = Math.round(dados.current_weather.temperature);
+      climaEl.textContent = `${temp}°C ☀️`;
+    }
+  } catch (e) {
+    climaEl.textContent = '31°C ☀️';
+  }
+}
+
+async function buscarCotacaoDolar() {
+  const dolarEl = document.querySelector('#usd-rate');
+  if (!dolarEl) return;
+  try {
+    const res = await fetch('https://economia.awesomeapi.com.br/last/USD-BRL');
+    const dados = await res.json();
+    if (dados?.USDBRL?.bid) {
+      const valor = parseFloat(dados.USDBRL.bid).toFixed(2).replace('.', ',');
+      dolarEl.textContent = `R$ ${valor}`;
+    }
+  } catch (e) {
+    dolarEl.textContent = 'Indisponível';
+  }
+}
+
+buscarClimaBodoco();
+buscarCotacaoDolar();
+
+setInterval(() => {
+  buscarClimaBodoco();
+  buscarCotacaoDolar();
+}, 15 * 60 * 1000);

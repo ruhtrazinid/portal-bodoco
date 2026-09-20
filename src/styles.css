@@ -23,10 +23,59 @@ a { color: inherit; }
 .skip-link { position: fixed; top: -80px; left: 20px; z-index: 1000; background: var(--yellow); color: var(--ink); padding: 12px 16px; font-weight: 800; transition: top .2s; }
 .skip-link:focus { top: 20px; }
 
-.demo-notice { background: var(--ink); color: var(--white); font-size: 11px; letter-spacing: .04em; }
-.notice-inner { min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.demo-notice strong { color: var(--yellow); }
-.notice-date { color: #aaaab0; }
+/* FAIXA SUPERIOR AO VIVO */
+.live-ticker-bar {
+  background: var(--ink);
+  color: var(--white);
+  font-size: 11px;
+  letter-spacing: .04em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ticker-inner {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.ticker-left, .ticker-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ticker-item strong {
+  color: var(--yellow);
+  font-weight: 800;
+}
+
+.ticker-dot {
+  color: #00ff73;
+  font-style: normal;
+  font-size: 9px;
+  animation: pulse 1.8s infinite;
+}
+
+.ticker-sep {
+  color: #4b4b52;
+}
+
+#live-clock {
+  font-variant-numeric: tabular-nums;
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+.notice-date {
+  color: #aaaab0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
 
 .site-header { background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 40; }
 .header-main { height: 86px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 44px; }
@@ -296,7 +345,8 @@ footer { background: #09090a; color: var(--white); padding: 40px 0 18px; }
 
 @media (max-width: 620px) {
   .shell { width: min(calc(100% - 28px), var(--max)); }
-  .notice-inner { justify-content: center; text-align: center; min-height: 40px; }.notice-date { display: none; }
+  .ticker-inner { justify-content: center; gap: 8px; font-size: 10px; padding: 6px 0; }
+  .notice-date, .ticker-sep { display: none; }
   .header-main { height: 72px; }.brand-mark-image { width: 52px; height: 40px; }.brand-mark { width: 40px; height: 40px; box-shadow: 4px 4px 0 var(--yellow); }.brand-mark b { font-size: 21px; }.brand-copy strong { font-size: 14px; }.brand-copy b { font-size: 21px; }
   .header-actions { gap: 5px; }.contact-link, .instagram-link { min-height: 34px; padding: 8px; }.main-nav { top: 112px; }
   section { scroll-margin-top: 72px; }
