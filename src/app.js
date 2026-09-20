@@ -262,7 +262,7 @@ function bindStoryEvents(element) {
 document.querySelectorAll('.story-open').forEach(bindStoryEvents);
 
 // -------------------------------------------------------------
-// INTEGRAÇÃO HYGRAPH (CMS)
+// INTEGRAÇÃO HYGRAPH (CMS) COM DESTAQUES DINÂMICOS
 // -------------------------------------------------------------
 async function carregarNoticiasHygraph() {
   const query = `
@@ -296,14 +296,14 @@ async function carregarNoticiasHygraph() {
 
     if (!Array.isArray(listaNoticias) || listaNoticias.length === 0) return;
 
-    listaNoticias.reverse().forEach((noticia) => {
+    // Registra todas as notícias no objeto stories
+    listaNoticias.forEach((noticia) => {
       const storyKey = `hygraph-${noticia.id}`;
       const dataObj = new Date(noticia.publishedAt);
       const dataFormatada = dataObj.toLocaleDateString('pt-BR', {
         day: 'numeric',
         month: 'long'
       });
-      const dataIso = dataObj.toISOString().split('T')[0];
       const categoriaNome = (noticia.categoria || 'Geral').toUpperCase();
 
       let paragrafos = [];
@@ -325,6 +325,92 @@ async function carregarNoticiasHygraph() {
         imageAlt: noticia.titulo,
         body: paragrafos
       };
+    });
+
+    // 1. Matéria mais recente assume o LEAD PRINCIPAL (esquerda)
+    if (listaNoticias[0]) {
+      const n1 = listaNoticias[0];
+      const slot1 = document.querySelector('#lead-story-slot');
+      if (slot1) {
+        slot1.dataset.story = `hygraph-${n1.id}`;
+        const visualBox = document.querySelector('#lead-visual-container');
+        const img = document.querySelector('#lead-img');
+        if (n1.capa?.url && img && visualBox) {
+          img.src = n1.capa.url;
+          img.style.display = 'block';
+          visualBox.style.backgroundImage = 'none';
+        }
+        const cat = document.querySelector('#lead-category');
+        if (cat) cat.textContent = (n1.categoria || 'DESTAQUE').toUpperCase();
+        const tit = document.querySelector('#lead-title');
+        if (tit) tit.textContent = n1.titulo;
+        const sub = document.querySelector('#lead-subtitle');
+        if (sub) sub.textContent = n1.subtitulo || '';
+      }
+    }
+
+    // 2. Segunda notícia assume o mini-destaque 1
+    if (listaNoticias[1]) {
+      const n2 = listaNoticias[1];
+      const slot2 = document.querySelector('#sublead-story-slot-1');
+      if (slot2) {
+        slot2.dataset.story = `hygraph-${n2.id}`;
+        const img = document.querySelector('#sublead-1-img');
+        if (img && n2.capa?.url) img.src = n2.capa.url;
+        const cat = document.querySelector('#sublead-1-category');
+        if (cat) cat.textContent = (n2.categoria || 'REGIÃO').toUpperCase();
+        const tit = document.querySelector('#sublead-1-title');
+        if (tit) tit.textContent = n2.titulo;
+        const tim = document.querySelector('#sublead-1-time');
+        if (tim) tim.textContent = new Date(n2.publishedAt).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+      }
+    }
+
+    // 3. Terceira notícia assume o mini-destaque 2
+    if (listaNoticias[2]) {
+      const n3 = listaNoticias[2];
+      const slot3 = document.querySelector('#sublead-story-slot-2');
+      if (slot3) {
+        slot3.dataset.story = `hygraph-${n3.id}`;
+        const img = document.querySelector('#sublead-2-img');
+        if (img && n3.capa?.url) img.src = n3.capa.url;
+        const cat = document.querySelector('#sublead-2-category');
+        if (cat) cat.textContent = (n3.categoria || 'POLÍTICA').toUpperCase();
+        const tit = document.querySelector('#sublead-2-title');
+        if (tit) tit.textContent = n3.titulo;
+        const tim = document.querySelector('#sublead-2-time');
+        if (tim) tim.textContent = new Date(n3.publishedAt).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+      }
+    }
+
+    // 4. Quarta notícia assume o mini-destaque 3
+    if (listaNoticias[3]) {
+      const n4 = listaNoticias[3];
+      const slot4 = document.querySelector('#sublead-story-slot-3');
+      if (slot4) {
+        slot4.dataset.story = `hygraph-${n4.id}`;
+        const img = document.querySelector('#sublead-3-img');
+        if (img && n4.capa?.url) img.src = n4.capa.url;
+        const cat = document.querySelector('#sublead-3-category');
+        if (cat) cat.textContent = (n4.categoria || 'POLÍTICA').toUpperCase();
+        const tit = document.querySelector('#sublead-3-title');
+        if (tit) tit.textContent = n4.titulo;
+        const tim = document.querySelector('#sublead-3-time');
+        if (tim) tim.textContent = new Date(n4.publishedAt).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+      }
+    }
+
+    // 5. Demais notícias (da 5ª em diante) entram no grid padrão
+    const restantes = listaNoticias.slice(4).reverse();
+    restantes.forEach((noticia) => {
+      const storyKey = `hygraph-${noticia.id}`;
+      const dataObj = new Date(noticia.publishedAt);
+      const dataFormatada = dataObj.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long'
+      });
+      const dataIso = dataObj.toISOString().split('T')[0];
+      const categoriaNome = (noticia.categoria || 'Geral').toUpperCase();
 
       if (newsGrid) {
         const article = document.createElement('article');
@@ -633,12 +719,10 @@ function iniciarRotacaoManchetes() {
     }, 400);
   }
 
-  // Define a primeira notícia de imediato
   if (listaNoticias.length > 0) {
     apresentarNoticia(listaNoticias[0]);
   }
 
-  // Alterna a cada 5 segundos
   setInterval(avancarManchete, 5000);
 }
 

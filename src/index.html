@@ -84,43 +84,45 @@
               <span class="eyebrow"><i></i> Informação do Araripe</span>
               <h1 id="destaques-title">Agora em destaque</h1>
             </div>
-            <time datetime="2026-09-15">Terça-feira, 15 de setembro</time>
+            <time datetime="2026-09-15" id="hero-date">Terça-feira, 15 de setembro</time>
           </div>
 
           <div class="hero-grid">
-            <article class="lead-story story-open" tabindex="0" role="button" data-story="tce-contratacoes-temporarias">
-              <div class="lead-visual article-photo photo-tce" role="img" aria-label="Sede do Tribunal de Contas do Estado de Pernambuco"></div>
+            <article class="lead-story story-open" id="lead-story-slot" tabindex="0" role="button" data-story="tce-contratacoes-temporarias">
+              <div class="lead-visual article-photo photo-tce" id="lead-visual-container" role="img" aria-label="Sede do Tribunal de Contas do Estado de Pernambuco">
+                <img id="lead-img" src="./assets/tce-pe-contratacoes-temporarias.jpg" alt="" style="width:100%; height:100%; object-fit:cover; display:none;" />
+              </div>
               <div class="lead-overlay">
-                <div class="story-meta"><span class="tag tag-yellow">PERNAMBUCO</span><span>3 min de leitura</span></div>
-                <h2>TCE-PE alerta municípios para excesso de contratações temporárias</h2>
-                <p>Levantamento aponta que 120 das 184 prefeituras têm mais de 50% do quadro formado por servidores temporários.</p>
+                <div class="story-meta"><span class="tag tag-yellow" id="lead-category">PERNAMBUCO</span><span>3 min de leitura</span></div>
+                <h2 id="lead-title">TCE-PE alerta municípios para excesso de contratações temporárias</h2>
+                <p id="lead-subtitle">Levantamento aponta que 120 das 184 prefeituras têm mais de 50% do quadro formado por servidores temporários.</p>
                 <span class="read-more">Ler matéria <b aria-hidden="true">→</b></span>
               </div>
             </article>
 
             <div class="headline-stack" aria-label="Mais destaques">
-              <article class="mini-story story-open" tabindex="0" role="button" data-story="festival-gastronomico-araripina">
-                <div class="mini-visual article-thumb" aria-hidden="true"><img src="./assets/festival-gastronomico-araripina.jpg" alt="" /></div>
+              <article class="mini-story story-open" id="sublead-story-slot-1" tabindex="0" role="button" data-story="festival-gastronomico-araripina">
+                <div class="mini-visual article-thumb" aria-hidden="true"><img id="sublead-1-img" src="./assets/festival-gastronomico-araripina.jpg" alt="" /></div>
                 <div class="mini-copy">
-                  <div class="story-meta"><span class="tag">REGIÃO</span></div>
-                  <h3>Festival Gastronômico de Araripina celebra sabores do Sertão</h3>
-                  <time datetime="2026-09-14">14 de setembro</time>
+                  <div class="story-meta"><span class="tag" id="sublead-1-category">REGIÃO</span></div>
+                  <h3 id="sublead-1-title">Festival Gastronômico de Araripina celebra sabores do Sertão</h3>
+                  <time id="sublead-1-time" datetime="2026-09-14">14 de setembro</time>
                 </div>
               </article>
-              <article class="mini-story story-open" tabindex="0" role="button" data-story="bruno-marques-danilo">
-                <div class="mini-visual article-thumb" aria-hidden="true"><img src="./assets/bruno-marques-danilo-rodrigues.jpg" alt="" /></div>
+              <article class="mini-story story-open" id="sublead-story-slot-2" tabindex="0" role="button" data-story="bruno-marques-danilo">
+                <div class="mini-visual article-thumb" aria-hidden="true"><img id="sublead-2-img" src="./assets/bruno-marques-danilo-rodrigues.jpg" alt="" /></div>
                 <div class="mini-copy">
-                  <div class="story-meta"><span class="tag">POLÍTICA</span></div>
-                  <h3>Bruno Marques anuncia apoio do ex-prefeito de Bodocó Danilo Rodrigues</h3>
-                  <time datetime="2026-09-08">8 de setembro</time>
+                  <div class="story-meta"><span class="tag" id="sublead-2-category">POLÍTICA</span></div>
+                  <h3 id="sublead-2-title">Bruno Marques anuncia apoio do ex-prefeito de Bodocó Danilo Rodrigues</h3>
+                  <time id="sublead-2-time" datetime="2026-09-08">8 de setembro</time>
                 </div>
               </article>
-              <article class="mini-story story-open" tabindex="0" role="button" data-story="raquel-joao-instagram">
-                <div class="mini-visual article-thumb vertical-video-card" aria-hidden="true"><img src="./assets/raquel-joao-instagram.png" alt="" /></div>
+              <article class="mini-story story-open" id="sublead-story-slot-3" tabindex="0" role="button" data-story="raquel-joao-instagram">
+                <div class="mini-visual article-thumb vertical-video-card" aria-hidden="true"><img id="sublead-3-img" src="./assets/raquel-joao-instagram.png" alt="" /></div>
                 <div class="mini-copy">
-                  <div class="story-meta"><span class="tag">POLÍTICA</span></div>
-                  <h3>Raquel Lyra e João Campos trocam críticas pelo Instagram</h3>
-                  <time datetime="2026-09-14">14 de setembro</time>
+                  <div class="story-meta"><span class="tag" id="sublead-3-category">POLÍTICA</span></div>
+                  <h3 id="sublead-3-title">Raquel Lyra e João Campos trocam críticas pelo Instagram</h3>
+                  <time id="sublead-3-time" datetime="2026-09-14">14 de setembro</time>
                 </div>
               </article>
             </div>
@@ -298,36 +300,6 @@
       </div>
       <div class="shell footer-bottom"><span>© 2026 Portal Bodocó</span><span>Site público • Matérias reais e conteúdo demonstrativo</span></div>
     </footer>
-
-    <dialog class="story-dialog" id="story-dialog" aria-labelledby="dialog-title">
-      <button class="dialog-close" type="button" aria-label="Fechar matéria">×</button>
-      <div class="dialog-hero"><img id="dialog-image" src="" alt="" /><img class="dialog-brand-mark" src="./assets/portal-bodoco-mark.png" alt="" /><span class="tag" id="dialog-category">DEMONSTRAÇÃO</span><span class="demo-tag" id="dialog-demo">DEMO</span></div>
-      <div class="dialog-body">
-        <span class="eyebrow"><i></i> Portal Bodocó</span>
-        <h2 id="dialog-title"></h2>
-        <p class="dialog-lead" id="dialog-lead"></p>
-        <div class="dialog-byline"><span class="avatar"><img src="./assets/portal-bodoco-mark.png" alt="" /></span><span><b>Redação Portal Bodocó</b><small id="dialog-source"></small></span></div>
-        <div class="dialog-media" id="dialog-media"></div>
-        <div class="dialog-content" id="dialog-content"></div>
-      </div>
-    </dialog>
-
-    <dialog class="ad-inquiry-dialog" id="ad-inquiry-dialog" aria-labelledby="ad-inquiry-title">
-      <button class="dialog-close" id="close-ad-inquiry" type="button" aria-label="Fechar formulário">×</button>
-      <div class="ad-dialog-accent"><span>ANUNCIE NO PORTAL</span></div>
-      <div class="ad-dialog-body">
-        <span class="eyebrow"><i></i> Área comercial</span>
-        <h2 id="ad-inquiry-title">Leve sua marca mais longe</h2>
-        <p>Preencha esta demonstração para visualizar como funcionará o contato comercial. Nenhuma informação será enviada nesta versão privada.</p>
-        <form id="ad-inquiry-form">
-          <label>Seu nome<input type="text" name="name" required placeholder="Nome do responsável" /></label>
-          <label>Empresa ou serviço<input type="text" name="company" required placeholder="Nome da empresa" /></label>
-          <label>Contato<input type="tel" name="contact" required placeholder="WhatsApp ou telefone" /></label>
-          <label>Categoria<select name="category"><option>Comércio</option><option>Serviços</option><option>Oportunidades</option></select></label>
-          <button class="advertise-button" type="submit">Simular solicitação <span aria-hidden="true">→</span></button>
-        </form>
-      </div>
-    </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="./app.js" type="module"></script>
