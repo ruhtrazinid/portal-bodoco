@@ -23,7 +23,7 @@ a { color: inherit; }
 .skip-link { position: fixed; top: -80px; left: 20px; z-index: 1000; background: var(--yellow); color: var(--ink); padding: 12px 16px; font-weight: 800; transition: top .2s; }
 .skip-link:focus { top: 20px; }
 
-/* FAIXA SUPERIOR AO VIVO */
+/* FAIXA SUPERIOR AO VIVO EXPANDIDA */
 .live-ticker-bar {
   background: var(--ink);
   color: var(--white);
@@ -33,17 +33,18 @@ a { color: inherit; }
 }
 
 .ticker-inner {
-  min-height: 34px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
+  gap: 16px;
 }
 
 .ticker-left, .ticker-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .ticker-item strong {
@@ -62,19 +63,109 @@ a { color: inherit; }
   color: #4b4b52;
 }
 
+/* ÁREA DE MANCHETES ROTATIVAS */
+.ticker-headlines {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 460px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ticker-badge {
+  background: var(--red);
+  color: var(--white);
+  font-size: 8px;
+  font-weight: 900;
+  padding: 2px 5px;
+  border-radius: 2px;
+  letter-spacing: .08em;
+  flex-shrink: 0;
+}
+
+.headline-slider {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+#ticker-headline-text {
+  color: #e0e0e3;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+#ticker-headline-text:hover {
+  color: var(--yellow);
+}
+
+#ticker-headline-text.fade-out {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
 #live-clock {
   font-variant-numeric: tabular-nums;
   color: var(--yellow);
   font-weight: 700;
 }
 
-.notice-date {
-  color: #aaaab0;
+/* BOTÃO WHATSAPP DA REDAÇÃO */
+.whatsapp-report-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #25d366;
+  color: #000 !important;
+  font-weight: 800;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.whatsapp-report-link:hover {
+  background: #1eb855;
+  transform: translateY(-1px);
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
+}
+
+@media (max-width: 920px) {
+  .ticker-headlines {
+    display: none; /* Oculta manchetes intermediárias em tablets para não apertar */
+  }
+}
+
+@media (max-width: 620px) {
+  .ticker-inner {
+    justify-content: space-between;
+    font-size: 10px;
+    padding: 6px 0;
+  }
+  .ticker-sep, .ticker-headlines, .whatsapp-report-link span {
+    display: none; /* Deixa apenas o ícone no mobile para caber tudo */
+  }
+  .whatsapp-report-link {
+    padding: 5px 6px;
+  }
 }
 
 .site-header { background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 40; }
@@ -365,3 +456,60 @@ footer { background: #09090a; color: var(--white); padding: 40px 0 18px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+// -------------------------------------------------------------
+// ROTAÇÃO DE MANCHETES AUTOMÁTICAS NO TICKER
+// -------------------------------------------------------------
+function iniciarRotacaoManchetes() {
+  const headlineEl = document.querySelector('#ticker-headline-text');
+  if (!headlineEl) return;
+
+  // Extrai títulos disponíveis tanto do objeto stories quanto dos cards existentes
+  function obterTitulos() {
+    const lista = [];
+    document.querySelectorAll('.news-card, .lead-story, .mini-story').forEach((el) => {
+      const h2 = el.querySelector('h2');
+      const h3 = el.querySelector('h3');
+      const titulo = h2?.textContent || h3?.textContent;
+      const storyKey = el.dataset.story;
+      if (titulo && !lista.some(item => item.texto === titulo)) {
+        lista.push({ texto: titulo.trim(), story: storyKey });
+      }
+    });
+    return lista;
+  }
+
+  let index = 0;
+
+  function trocarManchete() {
+    const noticias = obterTitulos();
+    if (!noticias.length) return;
+
+    headlineEl.classList.add('fade-out');
+
+    setTimeout(() => {
+      index = (index + 1) % noticias.length;
+      const itemAtual = noticias[index];
+      headlineEl.textContent = itemAtual.texto;
+
+      // Ao clicar, se tiver a chave da matéria, abre o modal de leitura diretamente
+      headlineEl.onclick = (e) => {
+        if (itemAtual.story) {
+          e.preventDefault();
+          const targetCard = document.querySelector(`[data-story="${itemAtual.story}"]`);
+          if (targetCard) openStory(targetCard);
+        }
+      };
+
+      headlineEl.classList.remove('fade-out');
+    }, 400);
+  }
+
+  // Troca de manchete a cada 5 segundos
+  setInterval(trocarManchete, 5000);
+  
+  // Executa uma vez após carregar para definir a primeira
+  setTimeout(trocarManchete, 1000);
+}
+
+iniciarRotacaoManchetes();
