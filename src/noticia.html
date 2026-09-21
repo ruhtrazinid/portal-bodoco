@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" href="./assets/portal-bodoco-mark.png" />
     <link rel="stylesheet" href="./styles.css" />
 
-    <!-- META TAGS OPEN GRAPH OFICIAIS (SÍMBOLO PB NO WHATSAPP E REDES) -->
+    <!-- META TAGS OPEN GRAPH OFICIAIS DE RETAGUARDA -->
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="Portal Bodocó" />
     <meta property="og:title" id="og-title" content="Portal Bodocó — A notícia perto de você" />
@@ -431,24 +431,35 @@
         document.querySelector('#art-lead').textContent = dadosFinais.lead || '';
         document.querySelector('#art-source').textContent = dadosFinais.source || 'Redação Portal Bodocó';
 
-        // CONFIGURAÇÃO DOS LINKS DE COMPARTILHAMENTO COM TÍTULO EM NEGRITO NO WHATSAPP
-        const urlAtual = encodeURIComponent(window.location.href);
+        // ATUALIZAÇÃO DAS META TAGS DE PRÉVIA
+        const ogTitle = document.querySelector('#og-title');
+        if (ogTitle) ogTitle.setAttribute('content', `${dadosFinais.title} | Portal Bodocó`);
+
+        const ogDesc = document.querySelector('#og-description');
+        if (ogDesc) ogDesc.setAttribute('content', dadosFinais.lead || 'Confira a matéria completa no Portal Bodocó.');
+
+        const ogUrl = document.querySelector('#og-url');
+        if (ogUrl) ogUrl.setAttribute('content', window.location.href);
+
+        // CONFIGURAÇÃO DOS LINKS DE COMPARTILHAMENTO ATRAVÉS DA ROTA SERVERLESS (/api/share)
+        const shareUrl = `${window.location.origin}/api/share?id=${encodeURIComponent(storyId)}`;
+        const urlCodificada = encodeURIComponent(shareUrl);
         const textoWhatsapp = encodeURIComponent(`*${dadosFinais.title}*\n\nConfira a matéria completa no Portal Bodocó:\n`);
         const textoPadrao = encodeURIComponent(`${dadosFinais.title} — Portal Bodocó:`);
 
         const shareWhatsapp = document.querySelector('#share-whatsapp');
         if (shareWhatsapp) {
-          shareWhatsapp.href = `https://api.whatsapp.com/send?text=${textoWhatsapp}${urlAtual}`;
+          shareWhatsapp.href = `https://api.whatsapp.com/send?text=${textoWhatsapp}${urlCodificada}`;
         }
 
         const shareFacebook = document.querySelector('#share-facebook');
         if (shareFacebook) {
-          shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${urlAtual}`;
+          shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${urlCodificada}`;
         }
 
         const shareX = document.querySelector('#share-x');
         if (shareX) {
-          shareX.href = `https://twitter.com/intent/tweet?text=${textoPadrao}&url=${urlAtual}`;
+          shareX.href = `https://twitter.com/intent/tweet?text=${textoPadrao}&url=${urlCodificada}`;
         }
 
         const shareCopy = document.querySelector('#share-copy');
@@ -456,7 +467,7 @@
         if (shareCopy && copyText) {
           shareCopy.onclick = async () => {
             try {
-              await navigator.clipboard.writeText(window.location.href);
+              await navigator.clipboard.writeText(shareUrl);
               copyText.textContent = 'Link copiado!';
               shareCopy.style.background = '#28a745';
               setTimeout(() => {
@@ -464,7 +475,7 @@
                 shareCopy.style.background = '#555761';
               }, 2500);
             } catch (err) {
-              alert('Link: ' + window.location.href);
+              alert('Link: ' + shareUrl);
             }
           };
         }
