@@ -105,6 +105,49 @@
       .sidebar-links a:hover {
         color: var(--red);
       }
+
+      /* ESTILOS DOS BOTÕES DE COMPARTILHAMENTO */
+      .article-share-bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 18px 0 22px;
+        padding: 12px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+      .share-label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--muted);
+        letter-spacing: .06em;
+        margin-right: 4px;
+      }
+      .share-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        text-decoration: none;
+        color: var(--white);
+        border-radius: 3px;
+        border: none;
+        cursor: pointer;
+        transition: opacity .2s, transform .2s;
+      }
+      .share-btn:hover {
+        opacity: .9;
+        transform: translateY(-1px);
+      }
+      .share-btn-whatsapp { background: #25d366; color: #000; }
+      .share-btn-facebook { background: #1877f2; }
+      .share-btn-x { background: #000; }
+      .share-btn-copy { background: #555761; }
+
       @media (max-width: 920px) {
         .article-layout {
           grid-template-columns: 1fr;
@@ -189,6 +232,27 @@
             </span>
           </div>
 
+          <!-- BOTÕES DE COMPARTILHAMENTO -->
+          <div class="article-share-bar">
+            <span class="share-label">Compartilhar:</span>
+            <a id="share-whatsapp" class="share-btn share-btn-whatsapp" href="#" target="_blank" rel="noopener noreferrer" title="Compartilhar no WhatsApp">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.41a8.17 8.17 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24zm4.51 11.64c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.24-.75-.67-1.25-1.49-1.4-1.74-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.45.06-.69.32-.23.25-.9.88-.9 2.15s.92 2.5 1.05 2.67c.13.17 1.82 2.78 4.41 3.9 1.15.5 1.95.66 2.56.78.69.14 1.32.08 1.82-.07.56-.16 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
+              WhatsApp
+            </a>
+            <a id="share-facebook" class="share-btn share-btn-facebook" href="#" target="_blank" rel="noopener noreferrer" title="Compartilhar no Facebook">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              Facebook
+            </a>
+            <a id="share-x" class="share-btn share-btn-x" href="#" target="_blank" rel="noopener noreferrer" title="Compartilhar no X">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              X
+            </a>
+            <button id="share-copy" class="share-btn share-btn-copy" type="button" title="Copiar link da notícia">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span id="copy-btn-text">Copiar link</span>
+            </button>
+          </div>
+
           <img id="art-image" class="article-featured-image" src="" alt="" hidden />
           <div id="art-media"></div>
 
@@ -237,7 +301,6 @@
     <script type="module">
       import { stories } from './app.js';
 
-      // 1. Relógio, Clima e Cotação da barra superior
       function atualizarRelogio() {
         const relogio = document.querySelector('#live-clock');
         if (relogio) relogio.textContent = new Date().toLocaleTimeString('pt-BR', { hour12: false });
@@ -268,7 +331,6 @@
       }
       carregarClimaEDolar();
 
-      // 2. Menu mobile
       const btnMenu = document.querySelector('.menu-toggle');
       const menuNav = document.querySelector('#main-nav');
       if (btnMenu && menuNav) {
@@ -278,7 +340,6 @@
         });
       }
 
-      // 3. Obter o identificador da notícia a partir da URL
       const parametrosUrl = new URLSearchParams(window.location.search);
       const storyId = parametrosUrl.get('id');
 
@@ -292,7 +353,6 @@
 
         let materia = stories ? stories[storyId] : null;
 
-        // Se a notícia for proveniente do CMS Hygraph e ainda não constar em cache local
         if (!materia && storyId.startsWith('hygraph-')) {
           const idHygraph = storyId.replace('hygraph-', '');
           const query = `query { noticia(where: { id: "${idHygraph}" }) { titulo subtitulo categoria publishedAt capa { url } conteudo { text raw } } }`;
@@ -347,14 +407,51 @@
           ]
         } : materia;
 
-        // ** ATUALIZAÇÃO DO TÍTULO DA GUIA DO NAVEGADOR (PADRÃO G1) **
+        // Atualização da guia
         document.title = `${dadosFinais.title} | Portal Bodocó`;
 
-        // Preenchimento dos dados editoriais no ecrã
+        // Preenchimento textual
         document.querySelector('#art-category').textContent = dadosFinais.category || 'NOTÍCIA';
         document.querySelector('#art-title').textContent = dadosFinais.title;
         document.querySelector('#art-lead').textContent = dadosFinais.lead || '';
         document.querySelector('#art-source').textContent = dadosFinais.source || 'Redação Portal Bodocó';
+
+        // CONFIGURAÇÃO DOS LINKS DE COMPARTILHAMENTO
+        const urlAtual = encodeURIComponent(window.location.href);
+        const textoNoticia = encodeURIComponent(`${dadosFinais.title} — Portal Bodocó:`);
+
+        const shareWhatsapp = document.querySelector('#share-whatsapp');
+        if (shareWhatsapp) {
+          shareWhatsapp.href = `https://api.whatsapp.com/send?text=${textoNoticia}%20${urlAtual}`;
+        }
+
+        const shareFacebook = document.querySelector('#share-facebook');
+        if (shareFacebook) {
+          shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${urlAtual}`;
+        }
+
+        const shareX = document.querySelector('#share-x');
+        if (shareX) {
+          shareX.href = `https://twitter.com/intent/tweet?text=${textoNoticia}&url=${urlAtual}`;
+        }
+
+        const shareCopy = document.querySelector('#share-copy');
+        const copyText = document.querySelector('#copy-btn-text');
+        if (shareCopy && copyText) {
+          shareCopy.onclick = async () => {
+            try {
+              await navigator.clipboard.writeText(window.location.href);
+              copyText.textContent = 'Link copiado!';
+              shareCopy.style.background = '#28a745';
+              setTimeout(() => {
+                copyText.textContent = 'Copiar link';
+                shareCopy.style.background = '#555761';
+              }, 2500);
+            } catch (err) {
+              alert('Link: ' + window.location.href);
+            }
+          };
+        }
 
         const imagemElemento = document.querySelector('#art-image');
         if (dadosFinais.image) {
@@ -392,7 +489,6 @@
           caixaFonte.hidden = false;
         }
 
-        // Sugestões na barra lateral com outras matérias
         const barraLateral = document.querySelector('#sidebar-latest');
         if (barraLateral && stories) {
           barraLateral.replaceChildren();
