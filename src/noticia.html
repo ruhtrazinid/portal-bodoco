@@ -451,13 +451,14 @@
           if (twImg) twImg.setAttribute('content', imgUrlAbsoluta);
         }
 
-        // CONFIGURAÇÃO DOS LINKS DE COMPARTILHAMENTO
+        // CONFIGURAÇÃO DOS LINKS DE COMPARTILHAMENTO COM NEGRITO NO WHATSAPP
         const urlAtual = encodeURIComponent(window.location.href);
-        const textoNoticia = encodeURIComponent(`${dadosFinais.title} — Portal Bodocó:`);
+        const textoWhatsapp = encodeURIComponent(`*${dadosFinais.title}*\n\nConfira a matéria completa no Portal Bodocó:\n`);
+        const textoPadrao = encodeURIComponent(`${dadosFinais.title} — Portal Bodocó:`);
 
         const shareWhatsapp = document.querySelector('#share-whatsapp');
         if (shareWhatsapp) {
-          shareWhatsapp.href = `https://api.whatsapp.com/send?text=${textoNoticia}%20${urlAtual}`;
+          shareWhatsapp.href = `https://api.whatsapp.com/send?text=${textoWhatsapp}${urlAtual}`;
         }
 
         const shareFacebook = document.querySelector('#share-facebook');
@@ -467,7 +468,7 @@
 
         const shareX = document.querySelector('#share-x');
         if (shareX) {
-          shareX.href = `https://twitter.com/intent/tweet?text=${textoNoticia}&url=${urlAtual}`;
+          shareX.href = `https://twitter.com/intent/tweet?text=${textoPadrao}&url=${urlAtual}`;
         }
 
         const shareCopy = document.querySelector('#share-copy');
