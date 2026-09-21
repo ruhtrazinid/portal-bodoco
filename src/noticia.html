@@ -10,17 +10,19 @@
     <link rel="icon" type="image/png" href="./assets/portal-bodoco-mark.png" />
     <link rel="stylesheet" href="./styles.css" />
 
-    <!-- META TAGS OPEN GRAPH (PRÉVIA DO WHATSAPP, FACEBOOK E REDES) -->
+    <!-- META TAGS OPEN GRAPH OFICIAIS (SÍMBOLO PB NO WHATSAPP E REDES) -->
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="Portal Bodocó" />
     <meta property="og:title" id="og-title" content="Portal Bodocó — A notícia perto de você" />
     <meta property="og:description" id="og-description" content="Informação local e regional com clareza, agilidade e credibilidade." />
-    <meta property="og:image" id="og-image" content="https://portalbodoco.com.br/assets/portal-bodoco-logo.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image" id="og-image" content="https://portalbodoco.com.br/assets/portal-bodoco-mark.png" />
+    <meta property="og:image:secure_url" content="https://portalbodoco.com.br/assets/portal-bodoco-mark.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="520" />
+    <meta property="og:image:height" content="341" />
     <meta property="og:url" id="og-url" content="https://portalbodoco.com.br" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" id="twitter-image" content="https://portalbodoco.com.br/assets/portal-bodoco-logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" id="twitter-image" content="https://portalbodoco.com.br/assets/portal-bodoco-mark.png" />
 
     <style>
       .article-layout {
@@ -429,29 +431,7 @@
         document.querySelector('#art-lead').textContent = dadosFinais.lead || '';
         document.querySelector('#art-source').textContent = dadosFinais.source || 'Redação Portal Bodocó';
 
-        // ATUALIZAÇÃO DAS META TAGS DE PRÉVIA (WHATSAPP, FACEBOOK, TWITTER/X)
-        const ogTitle = document.querySelector('#og-title');
-        if (ogTitle) ogTitle.setAttribute('content', `${dadosFinais.title} | Portal Bodocó`);
-
-        const ogDesc = document.querySelector('#og-description');
-        if (ogDesc) ogDesc.setAttribute('content', dadosFinais.lead || 'Confira a matéria completa no Portal Bodocó.');
-
-        const ogUrl = document.querySelector('#og-url');
-        if (ogUrl) ogUrl.setAttribute('content', window.location.href);
-
-        if (dadosFinais.image) {
-          const imgUrlAbsoluta = dadosFinais.image.startsWith('http')
-            ? dadosFinais.image
-            : new URL(dadosFinais.image, window.location.origin).href;
-
-          const ogImg = document.querySelector('#og-image');
-          if (ogImg) ogImg.setAttribute('content', imgUrlAbsoluta);
-
-          const twImg = document.querySelector('#twitter-image');
-          if (twImg) twImg.setAttribute('content', imgUrlAbsoluta);
-        }
-
-        // CONFIGURAÇÃO DOS LINKS DE COMPARTILHAMENTO COM NEGRITO NO WHATSAPP
+        // CONFIGURAÇÃO DOS LINKS DE COMPARTILHAMENTO COM TÍTULO EM NEGRITO NO WHATSAPP
         const urlAtual = encodeURIComponent(window.location.href);
         const textoWhatsapp = encodeURIComponent(`*${dadosFinais.title}*\n\nConfira a matéria completa no Portal Bodocó:\n`);
         const textoPadrao = encodeURIComponent(`${dadosFinais.title} — Portal Bodocó:`);
